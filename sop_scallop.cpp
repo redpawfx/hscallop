@@ -18,11 +18,11 @@
 #define DLLEXPORT __declspec(dllexport)
 #endif
 
-#define MAKING_DSO
+//#define MAKING_DSO
 #define SESI_LITTLE_ENDIAN 1
 
 // CRT
-#include <sys\stat.h>
+#include <sys/stat.h>
 
 #include <limits.h>
 #include <strstream>
@@ -293,9 +293,9 @@ void Daemon::SetupCVEX(UT_String script)
         char *argv[4096];
         int argc = vexsrc.parse(argv, 4096);
 
-        OP_Caller       C(caller);
-        context.setOpCaller(&C);
-        context.setTime(now);
+        //OP_Caller       C(caller);
+        //context.setOpCaller(&C);
+        //context.setTime(now);
         context.addInput("P",CVEX_TYPE_VECTOR3,true);
 
         context.load(argc, argv );
@@ -381,7 +381,7 @@ OP_ERROR SOP_Scallop::cookMySop(OP_Context &context)
 
         if(useRamp)
         {
-                PRM_Template *rampTemplate = PRMgetRampTemplate ("ramp", PRM_MULTITYPE_RAMP_RGB, NULL, NULL);
+                //PRM_Template *rampTemplate = PRMgetRampTemplate ("ramp", PRM_MULTITYPE_RAMP_RGB, NULL, NULL);
                 if (ramp.getNodeCount () < 2)
                 {
                         ramp.addNode (0, UT_FRGBA (0, 0, 0, 1));
@@ -394,16 +394,19 @@ OP_ERROR SOP_Scallop::cookMySop(OP_Context &context)
 
         bool showPts = (evalInt("showpts",0,now)!=0);
 
+		/*
         if(showPts)
         {
                 float sz = evalInt("ptssz",0,now);
                 if(sz > 0)
                 {
                         float one = 1.0f;
-                        gdp->addAttrib("showpoints",4,GB_ATTRIB_FLOAT,&one);
-                        gdp->addAttrib("revealsize",4,GB_ATTRIB_FLOAT,&sz);
+
+                        gdp->addAttribute("showpoints",4,GA_ATTRIB_FLOAT_&one);
+                        gdp->addAttribute("revealsize",4,GB_ATTRIB_FLOAT,&sz);
                 };
         };
+		*/
 
         int cnt = evalInt("daemons", 0, now);
 
@@ -506,9 +509,10 @@ OP_ERROR SOP_Scallop::cookMySop(OP_Context &context)
 
         total >>= degr;
 
-        GB_AttributeRef cntt = gdp->addAttrib("count",4,GB_ATTRIB_INT,&total);
+		GA_RWHandleI cntt(gdp->addIntTuple(GA_ATTRIB_POINT, "count", 4, GA_Defaults(1.0)));
 
-        GB_AttributeRef dt = gdp->addDiffuseAttribute(GEO_POINT_DICT);
+
+        GB_AttributeRef dt(gdp->addDiffuseAttribute(GEO_POINT_DICT));
         gdp->addVariableName("Cd","Cd");
 
         UT_Vector3 current(0,0,0);
@@ -1291,7 +1295,7 @@ void SOP_Scallop::SaveData(float time)
 
         if(useRamp)
         {
-                PRM_Template *rampTemplate = PRMgetRampTemplate ("ramp", PRM_MULTITYPE_RAMP_RGB, NULL, NULL);
+                //PRM_Template *rampTemplate = PRMgetRampTemplate ("ramp", PRM_MULTITYPE_RAMP_RGB, NULL, NULL);
                 if (ramp.getNodeCount () < 2)
                 {
                         ramp.addNode (0, UT_FRGBA (0, 0, 0, 1));
